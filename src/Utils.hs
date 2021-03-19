@@ -1,4 +1,5 @@
 module Utils where 
+---import Data.Text.Internal.Search
 
 firstChar :: String -> Maybe Char
 firstChar (c:str) = Just c
@@ -30,3 +31,5 @@ getWhileParagraph' (x:xs) (a, b) =
         Just _ -> getWhileParagraph' xs (x:a, b)
         Nothing -> (reverse a, x:xs)
 getWhileParagraph' _ (a, b) = (reverse a, b)
+
+
