@@ -20,3 +20,13 @@ getWhileList' (l:ls) (x,y) = case l of
     "" -> getWhileList' ls (x, y)
     _ -> (reverse x, l:ls)
 getWhileList' _ (x,y) = (reverse x, [])
+
+getWhileParagraph :: [String] -> ([String], [String])
+getWhileParagraph x = getWhileParagraph' x ([], [])
+
+getWhileParagraph' :: [String] -> ([String], [String]) -> ([String], [String])
+getWhileParagraph' (x:xs) (a, b) = 
+    case firstChar x of 
+        Just _ -> getWhileParagraph' xs (x:a, b)
+        Nothing -> (reverse a, x:xs)
+getWhileParagraph' _ (a, b) = (reverse a, b)
