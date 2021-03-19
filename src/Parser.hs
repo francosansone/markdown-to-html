@@ -62,55 +62,33 @@ parseParagraph3' x acc =
             in 
                 parseParagraph3' r (h:acc)
 
-parseBold :: String -> (Maybe Text, String)
-parseBold s = case stripPrefix "**" s of 
+
+parsePrettyParagraph :: (String -> Maybe String) -> String -> (Maybe Text, String)
+parsePrettyParagraph f s = case f s of 
     Just "" -> (Nothing, s)
     Just (' ':x) -> (Nothing, s)
-    Just x -> getBold x 
+    Just x -> getPrettyParagraph x f
     Nothing -> (Nothing, s)
 
+getPrettyParagraph :: String -> (String -> Maybe String) -> (Maybe Text, String)
+getPrettyParagraph x f = getPrettyParagraph' f x ""
 
-getBold :: String -> (Maybe Text, String)
-getBold x = getBold' x ""
-
-getBold' "" s = (Nothing, reverse s)
-getBold' " " s = (Nothing, reverse s)
-getBold' (' ':x) s = let  h = head x 
-                          r = tail x 
+getPrettyParagraph' f "" s = (Nothing, reverse s)
+getPrettyParagraph' f " " s = (Nothing, reverse s)
+getPrettyParagraph' f (' ':x) s = let h = head x 
+                                      r = tail x 
                     in
-                        getBold' r (h:(' ':s))
-getBold' x s = 
-    case stripPrefix "**" x of 
+                        getPrettyParagraph' f r (h:(' ':s))
+getPrettyParagraph' f x s = 
+    case f x of 
         Just a -> (Just (Bold (reverse s)), a)
         Nothing -> let  h = head x 
                         r = tail x 
                     in
-                        getBold' r (h:s)
+                        getPrettyParagraph' f r (h:s)
+
+parseBold :: String -> (Maybe Text, String)
+parseBold = parsePrettyParagraph (stripPrefix "**")
 
 parseItalic :: String -> (Maybe Text, String)
-parseItalic s = case stripPrefix "*" s of 
-    Just "" -> (Nothing, s)
-    Just (' ':x) -> (Nothing, s)
-    Just x -> getItalic x 
-    Nothing -> (Nothing, s)
-
-
-getItalic :: String -> (Maybe Text, String)
-getItalic x = getItalic' x ""
-
-getItalic' "" s = (Nothing, reverse s)
-getItalic' " " s = (Nothing, reverse s)
-getItalic' (' ':x) s = let  h = head x 
-                            r = tail x 
-                    in
-                        getItalic' r (h:(' ':s))
-getItalic' x s = 
-    case stripPrefix "*" x of 
-        Just a -> (Just (Italic (reverse s)), a)
-        Nothing -> let  h = head x 
-                        r = tail x 
-                    in
-                        getItalic' r (h:s)
-
-
-
+parseItalic = parsePrettyParagraph (stripPrefix "*")
