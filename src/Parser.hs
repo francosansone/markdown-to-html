@@ -63,32 +63,32 @@ parseParagraph3' x acc =
                 parseParagraph3' r (h:acc)
 
 
-parsePrettyParagraph :: (String -> Maybe String) -> String -> (Maybe Text, String)
-parsePrettyParagraph f s = case f s of 
+parsePrettyParagraph :: (String -> Maybe String) -> (String -> Text) -> String -> (Maybe Text, String)
+parsePrettyParagraph f g s = case f s of 
     Just "" -> (Nothing, s)
     Just (' ':x) -> (Nothing, s)
-    Just x -> getPrettyParagraph x f
+    Just x -> getPrettyParagraph x f g
     Nothing -> (Nothing, s)
 
-getPrettyParagraph :: String -> (String -> Maybe String) -> (Maybe Text, String)
-getPrettyParagraph x f = getPrettyParagraph' f x ""
+getPrettyParagraph :: String -> (String -> Maybe String) -> (String -> Text) -> (Maybe Text, String)
+getPrettyParagraph x f g = getPrettyParagraph' f g x ""
 
-getPrettyParagraph' f "" s = (Nothing, reverse s)
-getPrettyParagraph' f " " s = (Nothing, reverse s)
-getPrettyParagraph' f (' ':x) s = let h = head x 
-                                      r = tail x 
+getPrettyParagraph' f g "" s = (Nothing, reverse s)
+getPrettyParagraph' f g " " s = (Nothing, reverse s)
+getPrettyParagraph' f g (' ':x) s = let h = head x 
+                                        r = tail x
                     in
-                        getPrettyParagraph' f r (h:(' ':s))
-getPrettyParagraph' f x s = 
+                        getPrettyParagraph' f g r (h:(' ':s))
+getPrettyParagraph' f g x s = 
     case f x of 
-        Just a -> (Just (Bold (reverse s)), a)
+        Just a -> (Just (g (reverse s)), a)
         Nothing -> let  h = head x 
                         r = tail x 
                     in
-                        getPrettyParagraph' f r (h:s)
+                        getPrettyParagraph' f g r (h:s)
 
 parseBold :: String -> (Maybe Text, String)
-parseBold = parsePrettyParagraph (stripPrefix "**")
+parseBold = parsePrettyParagraph (stripPrefix "**") (\x -> Bold x)
 
 parseItalic :: String -> (Maybe Text, String)
-parseItalic = parsePrettyParagraph (stripPrefix "*")
+parseItalic = parsePrettyParagraph (stripPrefix "*") (\x -> Italic x)
