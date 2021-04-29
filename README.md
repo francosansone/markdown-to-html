@@ -40,15 +40,17 @@ El tipo que definimos es
 
 Y una serie de funciones primitivas
 
-parseHeader :: String -> Maybe Block
+header :: Int -> String -> Block 
 
-parseList :: [String] -> Block
+list :: [String] -> Block
 
-parseParagraph :: [String] -> Block
+paragraph :: [Text] -> Block
 
-parseBold :: String -> (Maybe Text, String)
+bold :: String -> Text 
 
-parseItalic :: String -> (Maybe Text, String)
+italic :: String -> Text 
+
+normal :: String -> Text 
 
 
 La función 

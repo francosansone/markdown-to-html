@@ -19,25 +19,59 @@ parser (s:xs) = case firstChar s of
     Nothing -> parser xs
 parser _ = []
 
+header :: Int -> String -> Block 
+header n s = Header (n, s)
+
+list :: [String] -> Block
+list s = List s 
+
+paragraph :: [Text] -> Block
+paragraph s = Paragraph s
+
+bold :: String -> Text 
+bold s = Bold s 
+
+italic :: String -> Text 
+italic s = Italic s
+
+normal :: String -> Text 
+normal s = Normal s
+
+combineList :: Block -> Block -> Block
+combineList (List x) (List y) = List (x ++ y)
+combineList _ _ = Unit
+
+combineParagraph :: [Text] -> [Text] -> Block 
+combineParagraph x y =  Paragraph (x ++ y)
+
+
 parseHeader :: String -> Maybe Block
 parseHeader x = 
+    let h = parseHeaderPrim x
+    in 
+        case h of 
+            Unit -> Nothing
+            y -> Just y
+
+parseHeaderPrim :: String -> Block
+parseHeaderPrim x = 
     let n = countChar x '#'
         sps = countChar (drop n x) ' '
     in 
         if n < 7 && sps > 0
-        then Just (Header (n, drop n x))
+        then header n (drop n x)
         else
-            Nothing
+            Unit
 
 parseList :: [String] -> Block
-parseList x = List x
+parseList x = list x
 
 parseRest s = 
     let (x, y) = getWhileParagraph s 
     in (parseParagraph x) : (parser y)
 
 parseParagraph :: [String] -> Block
-parseParagraph x = Paragraph (concat (map (\x -> parseParagraph2 x) x))
+parseParagraph x = paragraph (concat (map (\x -> parseParagraph2 x) x))
 
 parseParagraph2 :: String -> [Text]
 parseParagraph2 x = parseParagraph2' x ""
@@ -52,10 +86,10 @@ parseParagraph2' x acc =
             in 
                 parseParagraph2' r (h:acc)
 
-parseParagraph3' "" acc = [Normal (reverse acc)]
+parseParagraph3' "" acc = [normal (reverse acc)]
 parseParagraph3' x acc = 
     case parseItalic x of 
-        (Just x, y) -> ((Normal (reverse acc)):(x:(parseParagraph3' y "")))
+        (Just x, y) -> ((normal (reverse acc)):(x:(parseParagraph3' y "")))
         (Nothing, _) -> 
             let h = head x 
                 r = tail x 
@@ -88,7 +122,7 @@ getPrettyParagraph' f g x s =
                         getPrettyParagraph' f g r (h:s)
 
 parseBold :: String -> (Maybe Text, String)
-parseBold = parsePrettyParagraph (stripPrefix "**") (\x -> Bold x)
+parseBold = parsePrettyParagraph (stripPrefix "**") (\x -> bold x)
 
 parseItalic :: String -> (Maybe Text, String)
-parseItalic = parsePrettyParagraph (stripPrefix "*") (\x -> Italic x)
+parseItalic = parsePrettyParagraph (stripPrefix "*") (\x -> italic x)

@@ -8,6 +8,7 @@ generateHTML1 :: Block -> String
 generateHTML1 (Header (n, s)) = "<h" ++ show n ++ ">" ++ s ++ "</h>"
 generateHTML1 (List l) = "<ul>" ++ (generateList l) ++ "</ul>"
 generateHTML1 (Paragraph t) = "<p>" ++ (generateParagraph t) ++ "</p>"
+generateHTML1 Unit = "" 
 
 generateList :: [String] -> String 
 generateList s = concat (map (\x -> "<li>" ++ x ++ "</li>") s)
