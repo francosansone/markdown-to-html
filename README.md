@@ -15,8 +15,7 @@ Podemos Representar:
 
 El tipo que definimos es 
 
-<code>
-
+```
     type Markdown = [Block]
 
     data Block = Header (Int, String)
@@ -35,11 +34,11 @@ El tipo que definimos es
 
     deriving Show
 
-
-</code>
+```
 
 Y una serie de funciones primitivas
 
+```
 header :: Int -> String -> Block 
 
 list :: [String] -> Block
@@ -51,11 +50,21 @@ bold :: String -> Text
 italic :: String -> Text 
 
 normal :: String -> Text 
+```
 
+Y funciones derivadas
+
+```
+combineList :: Block -> Block -> Block
+
+combineParagraph :: [Text] -> [Text] -> Block 
+```
 
 La función 
 
+```
 parser :: [String] -> Markdown 
+```
 
 se encarga de seleccionarlas y combinarlas oportunamente.
 
